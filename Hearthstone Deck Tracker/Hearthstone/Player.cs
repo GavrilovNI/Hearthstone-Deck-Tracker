@@ -36,6 +36,7 @@ namespace Hearthstone_Deck_Tracker.Hearthstone
 		public string? LastDiedMinionCardId { get; set; }
 		public string? LastDrawnCardId { get; set; }
 		public int LibramReductionCount { get; private set; }
+		public int AbyssalCurseCount { get; private set; }
 
 		public bool HasCoin => Hand.Any(e => e.CardId == HearthDb.CardIds.NonCollectible.Neutral.TheCoinCore);
 		public int HandCount => Hand.Count();
@@ -309,13 +310,14 @@ namespace Hearthstone_Deck_Tracker.Hearthstone
 			CardsPlayedThisTurn.Clear();
 			LastDrawnCardId = null;
 			LibramReductionCount = 0;
+			AbyssalCurseCount = 0;
 		}
 
 		public void Draw(Entity entity, int turn)
 		{
 			if(IsLocalPlayer && entity.CardId != null)
 			{
-				UpdateKnownEntitesInDeck(entity.CardId);
+				UpdateKnownEntitiesInDeck(entity.CardId);
 				entity.Info.Hidden = false;
 			}
 			if(!IsLocalPlayer)
@@ -340,7 +342,7 @@ namespace Hearthstone_Deck_Tracker.Hearthstone
 		public void Play(Entity entity, int turn)
 		{
 			if(!IsLocalPlayer && entity.CardId != null)
-				UpdateKnownEntitesInDeck(entity.CardId, entity.Info.Turn);
+				UpdateKnownEntitiesInDeck(entity.CardId, entity.Info.Turn);
 			switch(entity.GetTag(GameTag.CARDTYPE))
 			{
 				case (int)CardType.TOKEN:
@@ -372,7 +374,7 @@ namespace Hearthstone_Deck_Tracker.Hearthstone
 		public void DeckToPlay(Entity entity, int turn)
 		{
 			if(entity.CardId != null)
-				UpdateKnownEntitesInDeck(entity.CardId);
+				UpdateKnownEntitiesInDeck(entity.CardId);
 			entity.Info.Turn = turn;
 			Log(entity);
 		}
@@ -425,7 +427,7 @@ namespace Hearthstone_Deck_Tracker.Hearthstone
 		public void HandDiscard(Entity entity, int turn)
 		{
 			if(!IsLocalPlayer && entity.CardId != null)
-				UpdateKnownEntitesInDeck(entity.CardId, entity.Info.Turn);
+				UpdateKnownEntitiesInDeck(entity.CardId, entity.Info.Turn);
 			entity.Info.Turn = turn;
 			entity.Info.Discarded = true;
 			Log(entity);
@@ -434,7 +436,7 @@ namespace Hearthstone_Deck_Tracker.Hearthstone
 		public void DeckDiscard(Entity entity, int turn)
 		{
 			if(entity.CardId != null)
-				UpdateKnownEntitesInDeck(entity.CardId);
+				UpdateKnownEntitiesInDeck(entity.CardId);
 			entity.Info.Turn = turn;
 			entity.Info.Discarded = true;
 			Log(entity);
@@ -478,7 +480,7 @@ namespace Hearthstone_Deck_Tracker.Hearthstone
 			Log(entity);
 		}
 
-		private void UpdateKnownEntitesInDeck(string cardId, int turn = int.MaxValue)
+		private void UpdateKnownEntitiesInDeck(string cardId, int turn = int.MaxValue)
 		{
 			var card = InDeckPrecitions.FirstOrDefault(x => x.CardId == cardId && turn >= x.Turn);
 			if(card != null)
@@ -495,7 +497,7 @@ namespace Hearthstone_Deck_Tracker.Hearthstone
 		public void SecretPlayedFromDeck(Entity entity, int turn)
 		{
 			if(entity.CardId != null)
-				UpdateKnownEntitesInDeck(entity.CardId);
+				UpdateKnownEntitiesInDeck(entity.CardId);
 			entity.Info.Turn = turn;
 			Log(entity);
 		}
@@ -553,6 +555,11 @@ namespace Hearthstone_Deck_Tracker.Hearthstone
 		}
 
 		public void UpdateLibramReduction(int change) => LibramReductionCount += change;
+
+		public void UpdateAbyssalCurse(int value)
+		{
+			AbyssalCurseCount = value > 0 ? value : AbyssalCurseCount + 1;
+		}
 
 		internal void ShuffleDeck()
 		{
