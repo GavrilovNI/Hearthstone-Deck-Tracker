@@ -17,6 +17,7 @@ using Hearthstone_Deck_Tracker.Hearthstone;
 using Hearthstone_Deck_Tracker.Controls.Overlay;
 using Hearthstone_Deck_Tracker.Utility.Logging;
 using System.Windows.Input;
+using Hearthstone_Deck_Tracker.Controls.Overlay.Battlegrounds;
 
 #endregion
 
@@ -389,7 +390,7 @@ namespace Hearthstone_Deck_Tracker.Windows
 						break;
 					}
 					var state = _game.GetBattlegroundsBoardStateFor(entity.CardId);
-					shouldShowOpponentInfo = !(state == null && entity.CardId == Core.Game.Player.Board.FirstOrDefault(x => x.IsHero)!.CardId);
+					shouldShowOpponentInfo = !(state == null && entity.CardId == Core.Game.Player.Board.FirstOrDefault(x => x.IsHero)?.CardId);
 					BgsOpponentInfo.Update(entity, state, turn);
 					break;
 				}
@@ -574,6 +575,8 @@ namespace Hearthstone_Deck_Tracker.Windows
 			// Only BgTierIcons are marked as clickable but a wrapper is scaled by the OverlayElementBehavior
 			if(element == BattlegroundsMinionsPanel.BgTierIcons)
 				return BgsTopBar.RenderTransform as ScaleTransform;
+			if(element == BattlegroundsSession.BattlegroundsSessionPanelTopGroup || element is BattlegroundsGameView)
+				return BattlegroundsSession.RenderTransform as ScaleTransform;
 
 			return element.RenderTransform as ScaleTransform;
 		}
