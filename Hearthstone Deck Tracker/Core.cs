@@ -72,6 +72,7 @@ namespace Hearthstone_Deck_Tracker
 			LocalizeDictionary.Instance.Culture = CultureInfo.GetCultureInfo("en-US");
 			_startUpTime = DateTime.UtcNow;
 			ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+			ServicePointManager.DefaultConnectionLimit = 10;
 			Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 			Config.Load();
 			Log.Info($"HDT: {Helper.GetCurrentVersion()}, Operating System: {Helper.GetWindowsVersion()}, .NET Framework: {Helper.GetInstalledDotNetVersion()}");
@@ -103,6 +104,9 @@ namespace Hearthstone_Deck_Tracker
 			MainWindow.LoadConfigSettings();
 			MainWindow.Show();
 			splashScreenWindow.Close();
+
+			if(Config.Instance.GoogleAnalytics)
+				HSReplayNetClientAnalytics.Initialize();
 
 			if(Config.Instance.DisplayHsReplayNoteLive && ConfigManager.PreviousVersion != null && ConfigManager.PreviousVersion < new Version(1, 1, 0))
 				MainWindow.FlyoutHsReplayNote.IsOpen = true;
