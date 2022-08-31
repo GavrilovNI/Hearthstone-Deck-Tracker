@@ -1,3 +1,34 @@
+## **Release v1.18.16 - 2022-08-30**
+**Fixes**:
+- Fixed an issue in Bob's Buddy where Quest Rewards would sometimes incorrectly be considered active.
+- Fixed an issue where Quest Rewards were not appearing in the Twitch Extension.
+
+## **Release v1.18.14 - 2022-08-30**
+**Updated for Hearthstone 24.2.0**
+
+**Fixes**:
+- Fixed an issue where it was revealed that the opponent was playing Renathal during mulligan. 
+
+**Notes**:
+- There are likely still issues with some new cards in Bob's Buddy. We will update these in the coming days.
+- Tooltips for vaious Battlegrounds cards may still be missing but should start appearing soon.
+- The experience progress bar has been disabled until we are able to update it for this patch.
+
+
+## **Release v1.18.13 - 2022-08-16**
+**Updated for Hearthstone 24.0.3**
+
+**Fixes**:
+- Fixed an issue where Secrets countered by Blademaster Okami were not handled correctly.
+
+## **Release v1.18.12 - 2022-08-03**
+**Fixes**:
+- Fixed an issue where Location cards were not working correctly with the Twitch Extension.
+- Fixed an issue where the chosen cards of Suspicious Alchemist/Usher/Pirate was revealed.
+
+## **Release v1.18.10 - 2022-08-01**
+**Added support for Murder at Castle Nathria**
+
 ## **Release v1.18.9 - 2022-07-26**
 **Updated for Hearthstone 24.0.0**
 

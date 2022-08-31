@@ -84,8 +84,20 @@ namespace Hearthstone_Deck_Tracker.LogReader.Handlers
 					return () => gameState.GameHandler?.HandleBattlegroundsPlayerTriples(id, value);
                 case IMMOLATESTAGE:
                     return () => OnImmolateStateChange(id, value, game);
+				case RESOURCES_USED:
+					return () => OnResourcesUsedChange(id, value, game);
 			}
 			return null;
+		}
+
+		private void OnResourcesUsedChange(int id, int value, IGame game)
+		{
+			if(game.PlayerEntity == null)
+				return;
+			if(id != game.PlayerEntity.Id)
+				return;
+			var available = game.PlayerEntity.GetTag(RESOURCES) + game.PlayerEntity.GetTag(TEMP_RESOURCES);
+			game.SecretsManager.HandleManaRemaining(Math.Max(0, available - value));
 		}
 
 		private void OnRebornChange(int id, int value, IGame game)
@@ -126,6 +138,13 @@ namespace Hearthstone_Deck_Tracker.LogReader.Handlers
 
 			if(entity.IsControlledBy(game.Opponent.Id))
 				return;
+
+			if(entity.GetTag(CREATOR_DBID) == Hearthstone.CardIds.SuspiciousMysteryDbfId)
+			{
+				// Card was created by Suspicious Alchemist/Usher/Pirate
+				return;
+			}
+
 
 			if(string.IsNullOrEmpty(targetEntity.CardId))
 			{
@@ -577,6 +596,14 @@ namespace Hearthstone_Deck_Tracker.LogReader.Handlers
 						if(!game.Entities.TryGetValue(id, out var entity))
 							return;
 						gameState.GameHandler?.HandleOpponentSecretTrigger(entity, cardId, gameState.GetTurnNumber(), id);
+					}
+					break;
+				case Zone.SETASIDE:
+					if(controller == game.Opponent.Id)
+					{
+						if(!game.Entities.TryGetValue(id, out var entity))
+							return;
+						gameState.GameHandler?.HandleOpponentSecretRemove(entity, cardId, gameState.GetTurnNumber());
 					}
 					break;
 				default:
