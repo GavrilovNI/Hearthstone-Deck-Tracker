@@ -1,3 +1,29 @@
+## **Release v1.18.22 - 2022-09-29**
+**Added support for Dual and Neutral classes on Duels stats machups table**
+**Added support for Maw and Disorder secrets**
+**Fixed an issue where secrets were excluded from the list when Tight-Lipped Witness was in play**
+**Fixed several issues in Bob's Buddy related to Hearthstone 24.4.0**
+
+## **Release v1.18.21 - 2022-09-27**
+**Updated for Hearthstone 24.4.0**
+
+## **Release v1.18.20 - 2022-09-09**
+**Updated for Hearthstone 24.2.2**
+
+## **Release v1.18.19 - 2022-09-06**
+**Fixes**:
+- Fixed various more Bob's Buddy simulation issues related to Hearthstone 24.2.0.
+
+## **Release v1.18.18 - 2022-09-01**
+**Fixes**:
+- Fixed various more Bob's Buddy simulation issues related to Hearthstone 24.2.0.
+
+## **Release v1.18.17 - 2022-08-31**
+**Fixes**:
+- Fixed various Bob's Buddy simulation issues related to Hearthstone 24.2.0.
+- Fixed an issue where the opponents Battlegrounds Hero was not correctly appearing in the Twitch Extension.
+- Fixed an issue where multiple Battlegrounds Quests were not correctly appearing in the Twitch Extension.
+
 ## **Release v1.18.16 - 2022-08-30**
 **Fixes**:
 - Fixed an issue in Bob's Buddy where Quest Rewards would sometimes incorrectly be considered active.
