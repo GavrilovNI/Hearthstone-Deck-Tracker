@@ -366,27 +366,36 @@ namespace Hearthstone_Deck_Tracker
 
 		public void SetOpponentHero(string? cardId)
 		{
-			var hero = Database.GetHeroNameFromId(cardId);
-			if(string.IsNullOrEmpty(hero))
+			var heroName = Database.GetHeroNameFromId(cardId);
+			if(string.IsNullOrEmpty(heroName))
 				return;
-			_game.Opponent.Class = hero!;
+			_game.Opponent.Class = heroName;
 			if(_game.CurrentGameStats != null)
 			{
-				_game.CurrentGameStats.OpponentHero = hero;
+				_game.CurrentGameStats.OpponentHero = heroName;
 				_game.CurrentGameStats.OpponentHeroCardId = cardId;
+				var hero = Database.GetCardFromId(cardId);
+				if (hero != null)
+					_game.CurrentGameStats.OpponentHeroClasses = hero.GetClasses().ToArray();
 			}
-			Log.Info("Opponent=" + hero);
+			Log.Info("Opponent=" + heroName);
 		}
 
 		public void SetPlayerHero(string? cardId)
 		{
-			var hero = Database.GetHeroNameFromId(cardId);
-			if(string.IsNullOrEmpty(hero))
+			var heroName = Database.GetHeroNameFromId(cardId);
+			if(string.IsNullOrEmpty(heroName))
 				return;
-			_game.Player.Class = hero!;
+			_game.Player.Class = heroName;
 			if(_game.CurrentGameStats != null)
-				_game.CurrentGameStats.PlayerHero = hero!;
-			Log.Info("Player=" + hero);
+			{
+				_game.CurrentGameStats.PlayerHero = heroName;
+				_game.CurrentGameStats.PlayerHeroCardId = cardId;
+				var hero = Database.GetCardFromId(cardId);
+				if (hero != null)
+					_game.CurrentGameStats.PlayerHeroClasses = hero.GetClasses().ToArray();
+			}
+			Log.Info("Player=" + heroName);
 		}
 
 		private readonly Queue<Tuple<ActivePlayer, int>> _turnQueue = new Queue<Tuple<ActivePlayer, int>>();
@@ -515,16 +524,6 @@ namespace Hearthstone_Deck_Tracker
 				// Called here so that UpdatePostGameMercenariesRewards can generate an accurate delta.
 				MercenariesCoins.Update();
 			}
-
-			HSReplayNetClientAnalytics.TryTrackMatchStart(
-				HearthDbConverter.GetBnetGameType(_game.CurrentGameType, _game.CurrentFormat),
-				_game.CurrentSelectedDeck != null && _game.CurrentFormat != null ? HearthDbConverter.ToHearthDbDeck(
-					_game.CurrentSelectedDeck,
-					HearthDbConverter.GetFormatType(_game.CurrentFormat)
-				) : null,
-				_game.Spectator,
-				timestamp
-			);
 		}
 
 		private void HandleAdventureRestart()
@@ -785,6 +784,16 @@ namespace Hearthstone_Deck_Tracker
 					RecordBattlegroundsGame();
 					Core.Game.BattlegroundsSessionViewModel.OnGameEnd();
 					Core.Windows.BattlegroundsSessionWindow.OnGameEnd();
+
+					var hero = _game.Entities.Values.FirstOrDefault(x => x.IsPlayer && x.IsHero);
+					var finalPlacement = hero?.GetTag(GameTag.PLAYER_LEADERBOARD_PLACE) ?? 0;
+					var battlegroundsGameDate = DateTime.Now.ToString("yyyy/MM/dd");
+					if(Config.Instance.LastBattlegroundsGameDate != battlegroundsGameDate && finalPlacement > 0 && !_game.Spectator)
+					{
+						HSReplayNetClientAnalytics.TryTrackEndFirstDailyBattlegroundsMatch(finalPlacement);
+						Config.Instance.LastBattlegroundsGameDate = battlegroundsGameDate;
+						Config.Save();
+					}
 				}
 
 				Influx.SendQueuedMetrics();
@@ -982,18 +991,7 @@ namespace Hearthstone_Deck_Tracker
 		public void HandlePlayerMulliganDone()
 		{
 			if(_game.IsBattlegroundsMatch)
-			{
 				Core.Overlay.HideBattlegroundsHeroPanel();
-
-				var hero = _game.Entities.Values.FirstOrDefault(x => x.IsPlayer && x.IsHero);
-				var heroCardId = hero?.CardId != null ? BattlegroundsUtils.GetOriginalHeroId(hero.CardId) : null;
-				var originalHero = heroCardId != null ? Database.GetCardFromId(heroCardId) : null;
-				if(originalHero != null)
-					HSReplayNetClientAnalytics.TryTrackBattlegroundsHeroPick(
-						originalHero,
-						HearthDbConverter.GetBnetGameType(_game.CurrentGameType, _game.CurrentFormat)
-					);
-			}
 			else if(_game.IsConstructedMatch)
 				Core.Overlay.HideMulliganPanel(false);
 		}
