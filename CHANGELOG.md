@@ -1,3 +1,9 @@
+## **Release v1.18.24 - 2022-11-01**
+**Updated for Hearthstone 24.6.0**
+
+## **Release v1.18.23 - 2022-10-13**
+**Updated for Hearthstone 24.4.3**
+
 ## **Release v1.18.22 - 2022-09-29**
 **Added support for Dual and Neutral classes on Duels stats machups table**
 **Added support for Maw and Disorder secrets**
